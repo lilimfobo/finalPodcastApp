@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Podcast Project</title>
+
+    <!--CSS--> 
+    <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="./css/thisPodcast.css">
+
+    <!--JS-->
+    <script src="./script.js" type="module" defer></script>
+
+</head>
+<body>
+
+    <header id="header">
+
+        <h1>PODCAST APP</h1>
+
+        <div>
+            <form>
+                <input id="search" type="text" placeholder="Search">
+                <button id="searchButton" type="submit" onclick="onSearchText(event)">Search</button>
+            </form>
+        </div>
+
+        <div id="navList">
+            <ul id="nav">
+                <select name="sort" id="sort" onchange="onChangeSort(event)">
+                    <option>Filter</option>
+                    <option>A-Z</option>
+                    <option>Z-A</option>
+                    <option>Recent-Oldest</option>
+                    <option>Oldest-Recent</option>
+                </select>
+                <select name="sort-favourites" id="sort-favourites" onchange="onChangeFavouriteSort(event)">
+                    <option>Filter</option>
+                    <option>A-Z</option>
+                    <option>Z-A</option>
+                    <option>Recent-Oldest</option>
+                    <option>Oldest-Recent</option>
+                </select>
+                <li><button onclick="renderFavouritesPage()">Favorites</button></li>
+            </ul>
+        </div>
+
+        <div>
+        <audio id="audio-player" controls>
+            <source id="audio-source" src="" type="audio/mp3" />
+        </audio>
+        </div>
+
+    </header>
+    
+    <div id="app"> LOADING... </div>
+
+</body>
+</html>

@@ -1,0 +1,56 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background-color: #fbf1d3;
+}
+
+#header {
+    background-color: #e3acf9;
+    color: #fbf1d3;
+    font-size: 27px;
+    position: sticky;
+    top:0;
+    padding: 1px;
+    z-index: 2;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+}
+
+.search {
+    color: #863A6F;
+    background-color: #eac7c7;
+}
+.submit {
+    color: #863A6F;
+    background-color: #eac7c7;
+}
+
+#app {
+    color: #3f0071;
+}
+
+#navList {
+    text-align: center;
+}
+
+#nav{
+    list-style-type: none;
+    text-align: center;
+    padding: 0;
+}
+
+#nav li{
+    display: inline;
+}
+
+#audio-player {
+    
+}
+
+.hide {
+    display: none;
+}
