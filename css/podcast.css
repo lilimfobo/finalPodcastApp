@@ -1,0 +1,49 @@
+* {
+    box-sizing: border-box;
+}
+
+.podcast {
+    max-width: 100%;
+    max-height: 20rem;
+    margin-top: 3px;
+    margin-left: 3px;
+    margin-right: 3px;
+    display: flex;
+    background-color: #863A6F;
+    color: #eac7c7;
+    border-radius: 5px;
+    position: relative;
+    z-index: 1;
+}
+
+.podcastImage {
+    height: 10rem;
+    width: 10rem;
+}
+
+.podcastImage img {
+    width: 10rem;
+    height: 10rem;
+    border-bottom-left-radius: 5px;
+    border-top-left-radius: 5px;
+    object-fit: cover;
+    position: absolute;
+}
+
+.title {
+    color: rgb(228, 228, 228);
+    width: 10rem auto;
+    text-align: center;
+}
+
+.title p {
+    margin-top: 5px;
+    margin-left: 5px;
+    font-weight: bold;
+}
+
+.seasons {
+    position: absolute;
+    left: 86%;
+    font-size: small;
+}
