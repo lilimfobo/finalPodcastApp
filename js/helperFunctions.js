@@ -1,149 +1,47 @@
-export function loadData(){
-  const load = localStorage.getItem("favouriteEpisodes");
-  if(load != null){
-    return JSON.parse(load);
-  }
-  return [];
+/** * Generic Sort Utility
+ * @param {Array} data
+ * @param {string} type
+ * @param {Function} selector
+ */
+const sortData = (data, type, selector) => {
+    const sorted = [...data].sort((a, b) => {
+        const valA = selector(a);
+        const valB = selector(b);
+        if (type.includes('A-Z') || type.includes('Oldest-Recent')) {
+            return valA > valB ? 1 : -1;
+        } else {
+            return valA < valB ? 1 : -1;
+        }
+    });
+    return sorted;
+};
+
+export function loadData() {
+    const load = localStorage.getItem("favouriteEpisodes");
+    return load ? JSON.parse(load) : [];
 }
 
-export function addEpisode(episode){
-  const load = localStorage.getItem("favouriteEpisodes");
-  if(load != null){
-    const items = JSON.parse(load);
-    items.push({
-      added: new Date(),
-      savedEpisode: episode
-    })
-
-    localStorage.setItem("favouriteEpisodes",JSON.stringify(items));
-  }
-  else {
-    localStorage.setItem("favouriteEpisodes",JSON.stringify([{
-      added: new Date(),
-      savedEpisode: episode
-    }]));
-  }
-
+export function addEpisode(episode) {
+    const items = loadData();
+    const exists = items.find(i => i.savedEpisode.id === episode.id);
+    if (!exists) {
+        items.push({ added: new Date().toISOString(), savedEpisode: episode });
+        localStorage.setItem("favouriteEpisodes", JSON.stringify(items));
+    }
 }
 
-export function removeEpisode(episode){
-  const load = localStorage.getItem("favouriteEpisodes");
-  if(load != null){
-    const items = JSON.parse(load);
-    const filtered = items.filter((storedEpisode) => {
-      if(storedEpisode.savedEpisode.title != episode.title && storedEpisode.savedEpisode.episode != episode.episode){
-        return storedEpisode
-      }
-    })
-
-    localStorage.setItem("favouriteEpisodes",JSON.stringify(filtered));
-  }
+export function removeEpisode(episodeId) {
+    const items = loadData();
+    const filtered = items.filter(item => item.savedEpisode.id !== episodeId);
+    localStorage.setItem("favouriteEpisodes", JSON.stringify(filtered));
 }
 
-export function onChangeSort (event) {
-  switch(event.target.value){
-    case 'A-Z':
-      showData.sort((show1, show2) => {
-        if ( show1.title < show2.title ){
-          return -1;
-        }
-        if ( show1.title > show2.title ){
-          return 1;
-        }
-        return 0;
-      });
-      renderAll(showData)
-    break;
-    case 'Z-A':
-      showData.sort((show1, show2) => { 
-        if ( show1.title > show2.title ){
-          return -1;
-        }
-        if ( show1.title < show2.title ){
-          return 1;
-        }
-        return 0;
-       });
-      renderAll(showData)
-    break;
-    case 'Oldest-Recent':
-      showData.sort((show1, show2) => {
-        if ( show1.updated < show2.updated ){
-          return -1;
-        }
-        if ( show1.updated > show2.updated ){
-          return 1;
-        }
-        return 0;
-      });
-      renderAll(showData)
-    break;
-    case 'Recent-Oldest':
-      showData.sort((show1, show2) => {
-        if ( show1.updated > show2.updated ){
-          return -1;
-        }
-        if ( show1.updated < show2.updated ){
-          return 1;
-        }
-        return 0;
-      });
-      renderAll(showData)
-    break;
-  }
-}
-
-export function onChangeFavouriteSort (event) {
-  event.preventDefault();
-  let data = loadData()
-  switch(event.target.value){
-    case 'A-Z':
-      data.sort((fav1, fav2) => {
-        if ( fav1.savedEpisode.title < fav2.savedEpisode.title ){
-          return -1;
-        }
-        if ( fav1.savedEpisode.title > fav2.savedEpisode.title ){
-          return 1;
-        }
-        return 0;
-      });
-      renderFavourites(data)
-    break;
-    case 'Z-A':
-      data.sort((fav1, fav2) => { 
-        if ( fav1.savedEpisode.title > fav2.savedEpisode.title ){
-          return -1;
-        }
-        if ( fav1.savedEpisode.title < fav2.savedEpisode.title ){
-          return 1;
-        }
-        return 0;
-       });
-       renderFavourites(data)
-    break;
-    case 'Oldest-Recent':
-      data.sort((fav1, fav2) => {
-        if ( fav1.added < fav2.added ){
-          return -1;
-        }
-        if ( fav1.added > fav2.added ){
-          return 1;
-        }
-        return 0;
-      });
-      renderFavourites(data)
-    break;
-    case 'Recent-Oldest':
-      data.sort((fav1, fav2) => {
-        if ( fav1.added > fav2.added ){
-          return -1;
-        }
-        if ( fav1.added < fav2.added ){
-          return 1;
-        }
-        return 0;
-      });
-      renderFavourites(data)
-    break;
-  }
+export function handleSort(data, sortValue) {
+    if (sortValue === 'A-Z' || sortValue === 'Z-A') {
+        return sortData(data, sortValue, (item) => (item.title || item.savedEpisode.title).toLowerCase());
+    }
+    if (sortValue.includes('Recent') || sortValue.includes('Oldest')) {
+        return sortData(data, sortValue, (item) => new Date(item.updated || item.added));
+    }
+    return data;
 }
