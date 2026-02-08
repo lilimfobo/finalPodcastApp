@@ -1,12 +1,15 @@
 🎙️ PodcastApp
+
 A modern, high-performance podcast streaming platform built with LitElement and JavaScript ES Modules.
 
 Live Demo: podcastzintle.netlify.app
 
 🚀 Overview
+
 PodcastApp is a single-page application (SPA) that allows users to browse thousands of podcasts, explore seasons and episodes, and manage a personalized library of favorites. It features a responsive design inspired by modern streaming services like Spotify.
 
 Key Features
+
 Dynamic Browsing: Fetch real-time data from the Podcast API.
 
 Interactive UI: Seamless navigation between Home, Show Details, and Favorites without page reloads.
@@ -20,6 +23,7 @@ Custom Audio Player: A sticky, global player that continues playing as you brows
 Responsive Design: Fully optimized for mobile, tablet, and desktop viewing.
 
 🛠️ Built With
+
 LitElement: For building lightweight, high-performance Web Components.
 
 JavaScript (ES6+): Modular logic for state management and API handling.
@@ -31,7 +35,6 @@ Netlify API: To fetch podcast metadata and episode files.
 📂 Project Structure
 The project is organized into modular folders to ensure scalability and clean code:
 
-Plaintext
 ├── index.html          # Main entry point and layout shell
 ├── styles.css          # Global styles and CSS variables
 ├── script.js           # Core application logic and routing
@@ -44,7 +47,8 @@ Plaintext
         ├── podcastSeason.js
         ├── podcastEpisode.js
         └── favourite.js
-        
+
+
 ⚙️ How to Run Locally
 Clone the repository:
 
@@ -62,6 +66,7 @@ python -m http.server 8000
 Open in Browser: Navigate to http://localhost:8000.
 
 🧠 Technical Highlights
+
 Asynchronous Initialization: The app renders the UI shell immediately while fetching data in the background to eliminate "loading lag."
 
 Custom Events: Uses a decoupled event system (remove-fav) to update the Favorites view in real-time.
