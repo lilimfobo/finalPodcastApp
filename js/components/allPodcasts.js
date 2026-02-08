@@ -1,118 +1,127 @@
 import { LitElement, html, css } from 'https://cdn.jsdelivr.net/gh/lit/dist@2/all/lit-all.min.js'
 
 export class Podcast extends LitElement {
-
   static get properties() {
     return {
-        key: { type: String },
-        image: { type: String },
-        label: { type: String },
-        seasons: { type: Number },
-        description: { type: String},
-        genres: { type: [String] },
-        lastUpdated: { type: String },
-        sortKey: {type: String }
+      image: { type: String },
+      label: { type: String },
+      seasons: { type: Number },
+      genres: { type: Array },
+      lastUpdated: { type: String }
     }
   }
 
   static styles = css`
-  * {
-    box-sizing: border-box;
-  }
-
-  .wrapper {
-    max-width: 100%;
-    max-height: 20rem;
-    margin-top: 3px;
-    margin-left: 3px;
-    margin-right: 3px;
-    display: flex;
-    background-color: #863A6F;
-    color: white;
-    border-radius: 5px;
-    position: relative;
-    z-index: 1;
-  }
-
-  .image {
-    height: 10rem;
-    width: 10rem;
-  }
-
-  .image img {
-    width: 10rem;
-    height: 10rem;
-    border-bottom-left-radius: 5px;
-    border-top-left-radius: 5px;
-    object-fit: cover;
-    position: absolute;
-  }
-
-  .title {
-    color: white;
-    width: 10rem auto;
-    text-align: center;
-    margin-left: 10rem;
-  }
-
-  .title p {
-    margin-top: 5px;
-    margin-left: 5px;
-    font-weight: bold;
-  }
-
-  .seasons {
-    position: absolute;
-    left: 86%;
-    font-size: small;
-  }
-  `
-
-  allGenres(genres){  
-    
-    if(genres != undefined ){
-      return genres.filter((genre) => {
-        return genre != "All" && genre != "Featured"
-      })
+    :host {
+      display: block;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
-    return [];
-  }
+    :host(:hover) {
+      transform: translateY(-5px);
+    }
+
+    .card {
+      background-color: #1e1e1e; /* Dark card background */
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      border: 1px solid #333;
+    }
+
+    .image-container {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      background: #2a2a2a;
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      /* Lazy loading is handled via attribute in render */
+    }
+
+    .content {
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .title {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fbf1d3;
+      display: -webkit-box;
+      -webkit-line-clamp: 1; /* Limits title to one line */
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .meta {
+      font-size: 0.85rem;
+      color: #b3b3b3;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .genres-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .genre-tag {
+      font-size: 0.7rem;
+      background: #e3acf933; /* Transparent accent */
+      color: #e3acf9;
+      padding: 2px 8px;
+      border-radius: 10px;
+      border: 1px solid #e3acf9;
+    }
+  `;
 
   render() {
+    const cleanGenres = (this.genres || []).filter(g => g !== "All" && g !== "Featured");
+    const date = new Date(this.lastUpdated).toLocaleDateString('en-US', { 
+        year: 'numeric', month: 'short', day: 'numeric' 
+    });
 
-    const seasonsText = `${this.seasons} Season${this.seasons > 1 ? 's' : ''}`;
-    
     return html`
-        <div id="showsWrapper" class="wrapper">
-
-            <div class="image">
-              <img src="${this.image}" />
-            </div>
-
-            <div class="title">
-              <p>${this.label}</p>
-            </div>
-
-            <div class="seasons">
-              <p>${seasonsText}</p>
-            </div>
-
-            <div class="genres">
-              <ul id="genres">
-              ${this.allGenres(this.genres).map(genre => {
-                return html`<li>${genre}</li>`
-              })}
-              </ul>
-            </div>
-
+      <div class="card">
+        <div class="image-container">
+          <img 
+            src="${this.image}" 
+            alt="${this.label}" 
+            loading="lazy" 
+          />
         </div>
-    `
+        <div class="content">
+          <h3 class="title">${this.label}</h3>
+          
+          <div class="meta">
+            <span>${this.seasons} Season${this.seasons > 1 ? 's' : ''}</span>
+            <span>${date}</span>
+          </div>
+
+          <ul class="genres-list">
+            ${cleanGenres.slice(0, 2).map(genre => html`
+              <li class="genre-tag">${genre}</li>
+            `)}
+          </ul>
+        </div>
+      </div>
+    `;
   }
-
-
 }
 
 customElements.define('podcast-preview', Podcast);
-
-

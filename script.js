@@ -71,27 +71,58 @@ const renderAll = (shows) => {
 };
 
 /**
- * Renders a single Podcast Detail view
+ * Fetches and renders the full detail view for a specific podcast.
+ * @param {string} podcastID - The unique ID of the show.
  */
-const renderSingle = async (id) => {
-    const container = document.querySelector("#app");
-    container.innerHTML = `<div class="loader">Fetching episodes...</div>`;
+async function renderSingle(podcastID) {
+    const appContainer = document.querySelector("#app");
 
-    const showData = await getData(`${STATE.apiBase}/id/${id}`);
-    container.innerHTML = "";
+    // 1. Immediate Feedback: Clear the grid and show a loader
+    // We also scroll to top so the user doesn't start at the bottom of the page
+    appContainer.innerHTML = `<div class="loader">Loading episodes...</div>`;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    const detail = document.createElement('podcast-detail');
-    Object.assign(detail, {
-        key: showData.id,
-        label: showData.title,
-        description: showData.description,
-        seasons: showData.seasons,
-        image: showData.image,
-        genres: showData.genres,
-        lastUpdated: showData.updated
-    });
+    try {
+        // 2. Fetch data using our improved API helper
+        const thisShowAPI = `https://podcast-api.netlify.app/id/${podcastID}`;
+        const thisShow = await getData(thisShowAPI);
 
-    container.appendChild(detail);
-};
+        if (!thisShow) throw new Error("Podcast not found");
+
+        // 3. Clear the loader and prepare the view
+        appContainer.innerHTML = "";
+        
+        // Changing the grid layout: The main grid is for cards. 
+        // For the detail view, we want a single column layout.
+        appContainer.style.display = "block"; 
+
+        // 4. Create the Web Component
+        const podcastDetail = document.createElement('podcast-detail');
+
+        // 5. Pass data using "Property Assignment" (faster than setAttribute)
+        // This maps the API response keys directly to your LitElement properties
+        Object.assign(podcastDetail, {
+            key: thisShow.id,
+            label: thisShow.title,
+            description: thisShow.description,
+            seasons: thisShow.seasons, // Passing the whole array of objects
+            image: thisShow.image,
+            genres: thisShow.genres,
+            lastUpdated: thisShow.updated
+        });
+
+        // 6. Inject into the DOM
+        appContainer.appendChild(podcastDetail);
+
+    } catch (error) {
+        console.error("Error rendering detail view:", error);
+        appContainer.innerHTML = `
+            <div class="error-container">
+                <p>Oops! We couldn't load this podcast.</p>
+                <button onclick="renderAll(showData)">Back to Home</button>
+            </div>
+        `;
+    }
+}
 
 init();
