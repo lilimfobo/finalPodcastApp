@@ -1,5 +1,5 @@
 import { getData } from "./JS/api.js";
-import { loadData, addEpisode, removeEpisode, onChangeSort, onChangeFavouriteSort } from "./JS/helperFunctions.js";
+import { loadData, handleSort } from "./JS/helperFunctions.js";
 import "./JS/components/allPodcasts.js";
 import "./JS/components/podcastDetail.js";
 import "./JS/components/podcastSeason.js";
@@ -8,21 +8,21 @@ import "./JS/components/favourite.js";
 
 const STATE = {
     allShows: [],
-    currentView: 'home',
     apiBase: "https://podcast-api.netlify.app"
 };
 
 /**
- * Initialization: Setup events and fetch data without blocking UI
+ * Initialization
  */
 const init = async () => {
     setupEventListeners();
     
     try {
-        STATE.allShows = await getData(`${STATE.apiBase}/shows`);
+        const data = await getData(`${STATE.apiBase}/shows`);
+        STATE.allShows = data || [];
         renderAll(STATE.allShows);
     } catch (error) {
-        document.querySelector("#app").innerHTML = `<p class="error">Failed to load podcasts. Please try again later.</p>`;
+        document.querySelector("#app").innerHTML = `<p class="error">Failed to load podcasts.</p>`;
     }
 };
 
@@ -39,16 +39,27 @@ const setupEventListeners = () => {
         renderAll(filtered);
     });
 
-    document.getElementById('sort').addEventListener('change', (e) => onChangeSort(e));
-    document.getElementById('sort-favourites').addEventListener('change', (e) => onChangeFavouriteSort(e));
+    // Integrated Sorting Logic
+    document.getElementById('sort').addEventListener('change', (e) => {
+        const sorted = handleSort(STATE.allShows, e.target.value);
+        renderAll(sorted);
+    });
+
+    document.getElementById('sort-favourites').addEventListener('change', (e) => {
+        const sorted = handleSort(loadData(), e.target.value);
+        renderFavourites(sorted);
+    });
 };
 
 /**
- * Renders the Grid of Podcast Previews
+ * Renders the Home Grid
  */
 const renderAll = (shows) => {
     const container = document.querySelector("#app");
     container.innerHTML = ""; 
+    
+    // Ensure the container is a grid again (in case we came from Single view)
+    container.style.display = "grid";
 
     document.getElementById("sort-favourites").classList.add('hide');
     document.getElementById("sort").classList.remove('hide');
@@ -56,11 +67,9 @@ const renderAll = (shows) => {
     shows.forEach((show) => {
         const preview = document.createElement('podcast-preview');
         Object.assign(preview, {
-            key: show.id,
-            label: show.title,
-            description: show.description,
-            seasons: show.seasons,
             image: show.image,
+            label: show.title,
+            seasons: show.seasons,
             genres: show.genres,
             lastUpdated: show.updated
         });
@@ -71,57 +80,70 @@ const renderAll = (shows) => {
 };
 
 /**
- * Fetches and renders the full detail view for a specific podcast.
- * @param {string} podcastID - The unique ID of the show.
+ * Renders the Favourites View
+ */
+const renderFavourites = (data) => {
+    const container = document.querySelector("#app");
+    container.innerHTML = "";
+    container.style.display = "block"; // Favorites look better in a list
+
+    document.getElementById("sort").classList.add('hide');
+    document.getElementById("sort-favourites").classList.remove('hide');
+
+    if (data.length === 0) {
+        container.innerHTML = `<div class="loader">No favorites saved yet.</div>`;
+        return;
+    }
+
+    data.forEach((item) => {
+        const { savedEpisode, added } = item;
+        const favElement = document.createElement('favourite-preview');
+        
+        Object.assign(favElement, {
+            label: savedEpisode.title,
+            description: savedEpisode.description,
+            episode: savedEpisode.episode,
+            file: savedEpisode.file,
+            added: added
+        });
+
+        // Listen for the custom 'remove-fav' event we added to favourite.js
+        favElement.addEventListener('remove-fav', () => {
+            renderFavourites(loadData());
+        });
+
+        container.appendChild(favElement);
+    });
+};
+
+/**
+ * Renders the Podcast Detail view
  */
 async function renderSingle(podcastID) {
     const appContainer = document.querySelector("#app");
-
-    // 1. Immediate Feedback: Clear the grid and show a loader
-    // We also scroll to top so the user doesn't start at the bottom of the page
     appContainer.innerHTML = `<div class="loader">Loading episodes...</div>`;
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     try {
-        // 2. Fetch data using our improved API helper
-        const thisShowAPI = `https://podcast-api.netlify.app/id/${podcastID}`;
-        const thisShow = await getData(thisShowAPI);
-
+        const thisShow = await getData(`${STATE.apiBase}/id/${podcastID}`);
         if (!thisShow) throw new Error("Podcast not found");
 
-        // 3. Clear the loader and prepare the view
         appContainer.innerHTML = "";
-        
-        // Changing the grid layout: The main grid is for cards. 
-        // For the detail view, we want a single column layout.
         appContainer.style.display = "block"; 
 
-        // 4. Create the Web Component
         const podcastDetail = document.createElement('podcast-detail');
-
-        // 5. Pass data using "Property Assignment" (faster than setAttribute)
-        // This maps the API response keys directly to your LitElement properties
         Object.assign(podcastDetail, {
-            key: thisShow.id,
             label: thisShow.title,
             description: thisShow.description,
-            seasons: thisShow.seasons, // Passing the whole array of objects
+            seasons: thisShow.seasons,
             image: thisShow.image,
-            genres: thisShow.genres,
             lastUpdated: thisShow.updated
         });
 
-        // 6. Inject into the DOM
         appContainer.appendChild(podcastDetail);
 
     } catch (error) {
-        console.error("Error rendering detail view:", error);
-        appContainer.innerHTML = `
-            <div class="error-container">
-                <p>Oops! We couldn't load this podcast.</p>
-                <button onclick="renderAll(showData)">Back to Home</button>
-            </div>
-        `;
+        appContainer.innerHTML = `<div class="error-container"><p>Error loading podcast.</p></div>`;
     }
 }
 
