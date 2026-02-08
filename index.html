@@ -2,60 +2,62 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Podcast Project</title>
-
-    <!--CSS--> 
+    <title>Podcast Stream</title>
     <link rel="stylesheet" href="./styles.css">
-    <link rel="stylesheet" href="./css/thisPodcast.css">
-
-    <!--JS-->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="./script.js" type="module" defer></script>
-
 </head>
 <body>
 
-    <header id="header">
+    <div class="layout-wrapper">
+        <header id="header">
+            <div class="header-top">
+                <h1 id="logo">PODCAST<span>APP</span></h1>
+                <nav id="navList">
+                    <ul id="nav">
+                        <li><button id="home-btn" class="nav-btn">Home</button></li>
+                        <li><button id="fav-btn" class="nav-btn">Favorites</button></li>
+                    </ul>
+                </nav>
+            </div>
 
-        <h1>PODCAST APP</h1>
+            <div class="controls-bar">
+                <form id="search-form">
+                    <input id="search" type="text" placeholder="Search podcasts...">
+                </form>
 
-        <div>
-            <form>
-                <input id="search" type="text" placeholder="Search">
-                <button id="searchButton" type="submit" onclick="onSearchText(event)">Search</button>
-            </form>
-        </div>
+                <div class="filters">
+                    <select id="sort" class="styled-select">
+                        <option value="">Sort Shows</option>
+                        <option value="a-z">A-Z</option>
+                        <option value="z-a">Z-A</option>
+                        <option value="newest">Recent-Oldest</option>
+                        <option value="oldest">Oldest-Recent</option>
+                    </select>
+                    
+                    <select id="sort-favourites" class="styled-select hide">
+                        <option value="">Sort Favorites</option>
+                        <option value="a-z">A-Z</option>
+                        <option value="z-a">Z-A</option>
+                    </select>
+                </div>
+            </div>
+        </header>
+        
+        <main id="app">
+            <div class="loader">Loading your library...</div>
+        </main>
 
-        <div id="navList">
-            <ul id="nav">
-                <select name="sort" id="sort" onchange="onChangeSort(event)">
-                    <option>Filter</option>
-                    <option>A-Z</option>
-                    <option>Z-A</option>
-                    <option>Recent-Oldest</option>
-                    <option>Oldest-Recent</option>
-                </select>
-                <select name="sort-favourites" id="sort-favourites" onchange="onChangeFavouriteSort(event)">
-                    <option>Filter</option>
-                    <option>A-Z</option>
-                    <option>Z-A</option>
-                    <option>Recent-Oldest</option>
-                    <option>Oldest-Recent</option>
-                </select>
-                <li><button onclick="renderFavouritesPage()">Favorites</button></li>
-            </ul>
-        </div>
-
-        <div>
-        <audio id="audio-player" controls>
-            <source id="audio-source" src="" type="audio/mp3" />
-        </audio>
-        </div>
-
-    </header>
-    
-    <div id="app"> LOADING... </div>
+        <footer id="player-bar">
+            <div class="now-playing">
+                <div id="current-track-info">Select a podcast to play</div>
+            </div>
+            <audio id="audio-player" controls>
+                <source id="audio-source" src="" type="audio/mp3" />
+            </audio>
+        </footer>
+    </div>
 
 </body>
 </html>
