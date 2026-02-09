@@ -78,4 +78,4 @@ Grid Layouts: Leverages grid-template-columns: repeat(auto-fill, ...) to create 
 👤 Author
 Zintle * GitHub: @lilimfobo
 
-Project: Final Podcast Refactor
+Project: Final Podcast App
